@@ -7,7 +7,6 @@ def main():
     points = {}
     poligons = {}
 
-    pos = 0
     for line in file:
         if(line[0] == "\n"):
             print("---------------")
@@ -30,7 +29,6 @@ def main():
             poligons[poligon.id] = poligon
             poligons[poligon.id].printPoints()
 
-            # points[i].printPoint()
     line = file.readline()
     aux = line.split()
     start = Point.Point("Start", float(aux[0]), float(aux[1]))
