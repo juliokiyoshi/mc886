@@ -26,6 +26,8 @@ def main():
             poligon = Poligon.Poligon(int(aux[0]))
             for i in aux[1:]:
                 poligon.AddPoint(points[i])
+            for i in range(1, len(aux) - 1):
+                poligon.CreateEdge(points[aux[i]], points[aux[i+1]])
             poligons[poligon.id] = poligon
             poligons[poligon.id].printPoints()
 
