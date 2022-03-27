@@ -1,12 +1,103 @@
+from ast import Break
 import Point
 import Poligon
+import numpy as np
+
+# global variables
+points = {}
+poligons = {}
+init = Point
+array_distances= []
+ordenation_distances=[]
+global_origin_distances_to_other_vertices = {}
 
 
-def main():
-    file = open("lab01\entrada1.txt", "r")
-    points = {}
-    poligons = {}
+# auxiliar functions
+def itsPossibleToTravel(actualVertice,DestinyVertice,poligonoOrigem,poligonoDestino):
+    if actualVertice == "Start":
+        return True
+    elif actualVertice != "Start" and poligonoOrigem == poligonoDestino:
+        return True
+    else:
+        intersectPoligon(actualVertice,DestinyVertice)
 
+## função para calular se o segmento r1r2 intercepta algum poligono ainda incompleta
+def intersectPoligon(r1,r2):
+    return True
+
+
+
+# Função para calcular se o segmento r1r2 e o segmento r3r4 se cruzam 
+# para mais informações:  https://stackoverflow.com/questions/3252194/numpy-and-line-intersections
+def findIfintersect(r1,r2,r3,r4):
+    a1 =np.array(r1)
+    a2=np.array(r2)
+    b1=np.array(r3)
+    b2=np.array(r4)
+    da = a2-a1
+    db = b2-b1
+    dp = a1-b1
+    dap = perp(da)
+    denom = np.dot( dap, db)
+    print("values of da = {} db = {} and dap ={} and denom = {}".format(da,db,dap,denom))
+    if denom == 0: # se denom == 0 eles nunca se cruzam caso contrario existe um ponto de intersecção entre duas retas 
+        return False
+    else: True
+   
+
+def perp( a ) :
+    b = np.empty_like(a)
+    b[0] = -a[1]
+    b[1] = a[0]
+    return b
+
+def getKey(dct,value):
+    return [key for key in dct if (dct[key] == value)]
+    
+
+# função que acha em qual poligono está um vertice
+def findPoligon(vertice,poligonsList):
+    for list in poligonsList:
+        for pts in list.points:
+            if pts.name == vertice:
+                return list.id
+
+
+def ordenationDistancesFromTheActualVertice(vertice,dict,sortedList):
+    listOfPoints = list(points.values())
+    list = []
+    for point in listOfPoints:
+        if point.name != "Start" and point.visit != False:
+            pt1= np.array(point.coord)
+            pt2= np.array(vertice.coord)
+            dist = np.linalg.norm(pt1 - pt2)
+            list.append(dist)
+            dict[point.name]=dist
+    temp=array_distances
+    temp=np.sort(temp)
+    for dist in temp:
+        sortedList.append(dist)
+
+    return dict, sortedList
+
+
+def ordenationDistancesBeteweenOriginAndAllVerices(origin):
+    listOfPoints= list(points.values())
+    for point in listOfPoints:
+        if point.name !="Start":
+            pt1= np.array(point.coord)
+            pt2= np.array(origin.coord)
+            dist = np.linalg.norm(pt1 - pt2)
+            array_distances.append(dist)
+            global_origin_distances_to_other_vertices[point.name]=dist
+        
+    temp=array_distances
+    temp=np.sort(temp)
+    for dist in temp:
+        ordenation_distances.append(dist)
+   
+def readFile(path):
+    file = open(path, "r")
     for line in file:
         if(line[0] == "\n"):
             print("---------------")
@@ -40,9 +131,47 @@ def main():
     points["Start"] = start
     points["Finish"] = finish
 
+    init.Point=start
     start.printPoint()
     finish.printPoint()
 
+# def moviment(vertice,pos):
+#     if(pos== 10):
+#         return
+#     print(pos)
+#     if vertice == init.Point.name:
+#         ordenationDistancesBeteweenOriginAndAllVerices(init.Point)
+#         NewVertice = getKey(global_origin_distances_to_other_vertices,ordenation_distances[pos])[0]
+#         lst= list(poligons.values())
+#         poligonId=findPoligon(NewVertice,lst)
+#         control_variables=itsPossibleToTravel(init.Point.name,poligonId,"zero",poligonId)
+#         if control_variables == True:
+#             print("next vertice is: {} \n".format(NewVertice))
+#             pos+=1
+#             moviment(vertice,pos)
+#     else:
+#         # calculate the distances to the new vertices 
+#         #findNewVertices(vertice)
+#         NewVertice = getKey(global_origin_distances_to_other_vertices,ordenation_distances[0])[pos]
+#         lst= list(poligons.values())
+#         poligonId=findPoligon(NewVertice,lst)
+#         control_variables=itsPossibleToTravel(init.Point.name,poligonId,"zero",poligonId)
+#         if control_variables == True:
+#             print("next vertice is: {} \n".format(NewVertice))
+#             i+=1
+#             moviment(vertice,pos)
+
+
+
+def main():
+    readFile("entrada1.txt")
+    print("partindo da origem temos a seguinte sequencia \n")
+    #moviment("Start",0)
+
+    
+
+    
+    
 
 if __name__ == "__main__":
     main()
