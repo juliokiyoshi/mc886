@@ -1,80 +1,99 @@
 from ast import Break
 import Point
 import Poligon
+import Robot
 import numpy as np
 
 # global variables
 points = {}
 poligons = {}
 init = Point
-array_distances= []
-ordenation_distances=[]
+array_distances = []
+ordenation_distances = []
 global_origin_distances_to_other_vertices = {}
 
 
 # auxiliar functions
-def itsPossibleToTravel(actualVertice,DestinyVertice,poligonoOrigem,poligonoDestino):
+def itsPossibleToTravel(actualVertice, DestinyVertice, poligonoOrigem, poligonoDestino):
     if actualVertice == "Start":
         return True
     elif actualVertice != "Start" and poligonoOrigem == poligonoDestino:
         return True
     else:
-        intersectPoligon(actualVertice,DestinyVertice)
+        intersectPoligon(actualVertice, DestinyVertice)
 
-## função para calular se o segmento r1r2 intercepta algum poligono ainda incompleta
-def intersectPoligon(r1,r2):
+# função para calular se o segmento r1r2 intercepta algum poligono ainda incompleta
+
+
+def intersectPoligon(r1, r2):
+    listOfPoligon = list(poligons.values())
+    for poligon in listOfPoligon:
+        for edge in poligon.edges:
+            if(not findIfIntersect(r1, r2, np.array(edge.point1.coord), np.array(edge.point2.coord))):
+                # print("Reta1 : {} {} \t Reta2: {}{} {}{}".format(
+                #    r1, r2, edge.point1.name, edge.point1.coord, edge.point2.name, edge.point2.coord))
+                return False
     return True
 
 
-
-# Função para calcular se o segmento r1r2 e o segmento r3r4 se cruzam 
+# Função para calcular se o segmento r1r2 e o segmento r3r4 se cruzam
 # para mais informações:  https://stackoverflow.com/questions/3252194/numpy-and-line-intersections
-def findIfintersect(r1,r2,r3,r4):
-    a1 =np.array(r1)
-    a2=np.array(r2)
-    b1=np.array(r3)
-    b2=np.array(r4)
+def findIfIntersect(r1, r2, r3, r4):
+    #print(r1, r2, r3, r4)
+    a1 = np.array(r1)
+    a2 = np.array(r2)
+    b1 = np.array(r3)
+    b2 = np.array(r4)
     da = a2-a1
     db = b2-b1
     dp = a1-b1
     dap = perp(da)
-    denom = np.dot( dap, db)
-    print("values of da = {} db = {} and dap ={} and denom = {}".format(da,db,dap,denom))
-    if denom == 0: # se denom == 0 eles nunca se cruzam caso contrario existe um ponto de intersecção entre duas retas 
+    denom = np.dot(dap, db)
+    num = np.dot(dap, dp)
+    #print("values of da = {} db = {} and dap ={} and denom = {}".format(da, db, dap, denom))
+    if denom == 0:  # se denom == 0 eles nunca se cruzam caso contrario existe um ponto de intersecção entre duas retas
         return False
-    else: True
-   
+    else:
+        interceptionPoint = (num / denom.astype(float))*db + b1
+        if(interceptionPoint[0] >= a1[0] and interceptionPoint[0] <= a2[0]) \
+                or (interceptionPoint[0] <= a1[0] and interceptionPoint[0] >= a2[0]):
+            print("Interception Point: ", interceptionPoint)
+            return True
+        else:
+            return False
 
-def perp( a ) :
+
+def perp(a):
     b = np.empty_like(a)
     b[0] = -a[1]
     b[1] = a[0]
     return b
 
-def getKey(dct,value):
+
+def getKey(dct, value):
     return [key for key in dct if (dct[key] == value)]
-    
+
 
 # função que acha em qual poligono está um vertice
-def findPoligon(vertice,poligonsList):
+def findPoligon(vertice, poligonsList):
     for list in poligonsList:
         for pts in list.points:
             if pts.name == vertice:
                 return list.id
 
 
-def ordenationDistancesFromTheActualVertice(vertice,dict,sortedList):
+def ordenationDistancesFromTheActualVertice(vertice, dict, sortedList):
     listOfPoints = list(points.values())
     list = []
     for point in listOfPoints:
         if point.name != "Start" and point.visit != False:
-            pt1= np.array(point.coord)
-            pt2= np.array(vertice.coord)
+            pt1 = np.array(point.coord)
+            pt2 = np.array(vertice.coord)
             dist = np.linalg.norm(pt1 - pt2)
             list.append(dist)
-            dict[point.name]=dist
-    temp=array_distances
-    temp=np.sort(temp)
+            dict[point.name] = dist
+    temp = array_distances
+    temp = np.sort(temp)
     for dist in temp:
         sortedList.append(dist)
 
@@ -82,20 +101,21 @@ def ordenationDistancesFromTheActualVertice(vertice,dict,sortedList):
 
 
 def ordenationDistancesBeteweenOriginAndAllVerices(origin):
-    listOfPoints= list(points.values())
+    listOfPoints = list(points.values())
     for point in listOfPoints:
-        if point.name !="Start":
-            pt1= np.array(point.coord)
-            pt2= np.array(origin.coord)
+        if point.name != "Start":
+            pt1 = np.array(point.coord)
+            pt2 = np.array(origin.coord)
             dist = np.linalg.norm(pt1 - pt2)
             array_distances.append(dist)
-            global_origin_distances_to_other_vertices[point.name]=dist
-        
-    temp=array_distances
-    temp=np.sort(temp)
+            global_origin_distances_to_other_vertices[point.name] = dist
+
+    temp = array_distances
+    temp = np.sort(temp)
     for dist in temp:
         ordenation_distances.append(dist)
-   
+
+
 def readFile(path):
     file = open(path, "r")
     for line in file:
@@ -131,7 +151,7 @@ def readFile(path):
     points["Start"] = start
     points["Finish"] = finish
 
-    init.Point=start
+    init.Point = start
     start.printPoint()
     finish.printPoint()
 
@@ -150,7 +170,7 @@ def readFile(path):
 #             pos+=1
 #             moviment(vertice,pos)
 #     else:
-#         # calculate the distances to the new vertices 
+#         # calculate the distances to the new vertices
 #         #findNewVertices(vertice)
 #         NewVertice = getKey(global_origin_distances_to_other_vertices,ordenation_distances[0])[pos]
 #         lst= list(poligons.values())
@@ -162,16 +182,23 @@ def readFile(path):
 #             moviment(vertice,pos)
 
 
-
 def main():
     readFile("entrada1.txt")
     print("partindo da origem temos a seguinte sequencia \n")
-    #moviment("Start",0)
+    robot = Robot.Robot(points["Start"], points)
+    visiblePoints = []
+    for point in list(robot.unvisitedPoints.values()):
+        if point != points["Start"]:
+            visible = intersectPoligon(robot.currentPoint.coord, point.coord)
+            if(visible):
+                print(point.name)
+                visiblePoints.append(point)
+                robot.addVisiblePoint(point)
+    robot.printVisiblePoints()
+    print()
 
-    
+    # moviment("Start",0)
 
-    
-    
 
 if __name__ == "__main__":
     main()
