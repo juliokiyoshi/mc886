@@ -1,3 +1,6 @@
+from __future__ import division
+
+
 from ast import Break
 import Point
 import Poligon
@@ -20,26 +23,33 @@ def itsPossibleToTravel(actualVertice, DestinyVertice, poligonoOrigem, poligonoD
     elif actualVertice != "Start" and poligonoOrigem == poligonoDestino:
         return True
     else:
-        intersectPoligon(actualVertice, DestinyVertice)
+        isVisible(actualVertice, DestinyVertice)
 
 # função para calular se o segmento r1r2 intercepta algum poligono ainda incompleta
 
+# retorna True se nao intersecta
 
-def intersectPoligon(r1, r2):
-    listOfPoligon = list(poligons.values())
-    for poligon in listOfPoligon:
+# retorna true se r2 é visivel de r1
+# retorna false se nao
+
+
+def isVisible(r1, r2):
+    for poligon in poligons.values():
         for edge in poligon.edges:
-            if(not findIfIntersect(r1, r2, np.array(edge.point1.coord), np.array(edge.point2.coord))):
-                # print("Reta1 : {} {} \t Reta2: {}{} {}{}".format(
-                #    r1, r2, edge.point1.name, edge.point1.coord, edge.point2.name, edge.point2.coord))
+            intersectionPoint = intersection(
+                line(r1, r2), line(edge.point1.coord, edge.point2.coord))
+            if(intersectionPoint):
+                #print(f"Intersecao de {r1} {r2} para {edge.point1.name}{edge.point1.coord} {edge.point2.name}{edge.point2.coord} em {intersectionPoint}")
                 return False
+    print("{} consegue ver {}".format(r1, r2), end=" ")
     return True
 
 
 # Função para calcular se o segmento r1r2 e o segmento r3r4 se cruzam
 # para mais informações:  https://stackoverflow.com/questions/3252194/numpy-and-line-intersections
+# retorna True se ha interseccao
 def findIfIntersect(r1, r2, r3, r4):
-    #print(r1, r2, r3, r4)
+    # print(r1, r2, r3, r4)
     a1 = np.array(r1)
     a2 = np.array(r2)
     b1 = np.array(r3)
@@ -50,17 +60,40 @@ def findIfIntersect(r1, r2, r3, r4):
     dap = perp(da)
     denom = np.dot(dap, db)
     num = np.dot(dap, dp)
-    #print("values of da = {} db = {} and dap ={} and denom = {}".format(da, db, dap, denom))
+    # print("values of da = {} db = {} and dap ={} and denom = {}".format(da, db, dap, denom))
     if denom == 0:  # se denom == 0 eles nunca se cruzam caso contrario existe um ponto de intersecção entre duas retas
         return False
     else:
         interceptionPoint = (num / denom.astype(float))*db + b1
-        if(interceptionPoint[0] >= a1[0] and interceptionPoint[0] <= a2[0]) \
-                or (interceptionPoint[0] <= a1[0] and interceptionPoint[0] >= a2[0]):
+        if(interceptionPoint[0] > a1[0] and interceptionPoint[0] < a2[0]) \
+                or (interceptionPoint[0] < a1[0] and interceptionPoint[0] > a2[0]):
             print("Interception Point: ", interceptionPoint)
             return True
         else:
             return False
+
+
+def line(p1, p2):
+    A = (p1[1] - p2[1])
+    B = (p2[0] - p1[0])
+    C = (p1[0]*p2[1] - p2[0]*p1[1])
+    return A, B, -C
+
+
+def intersection(L1, L2):
+    D = L1[0] * L2[1] - L1[1] * L2[0]
+    Dx = L1[2] * L2[1] - L1[1] * L2[2]
+    Dy = L1[0] * L2[2] - L1[2] * L2[0]
+    if D != 0:
+        x = Dx / D
+        y = Dy / D
+        if (x >= L1[0] and x <= L2[0]) or (x <= L1[0] and x >= L2[0]):
+            if(y >= L1[1] and y <= L2[1]) or (y <= L1[1] and y >= L2[1]):
+                return x, y
+        else:
+            return False
+    else:
+        return False
 
 
 def perp(a):
@@ -101,7 +134,7 @@ def ordenationDistancesFromTheActualVertice(vertice, dict, sortedList):
 
 
 def ordenationDistancesBeteweenOriginAndAllVerices(origin):
-    listOfPoints = list(points.values())
+    listOfPoints = points.values()
     for point in listOfPoints:
         if point.name != "Start":
             pt1 = np.array(point.coord)
@@ -140,7 +173,7 @@ def readFile(path):
             for i in range(1, len(aux) - 1):
                 poligon.CreateEdge(points[aux[i]], points[aux[i+1]])
             poligons[poligon.id] = poligon
-            poligons[poligon.id].printPoints()
+            poligons[poligon.id].printEdges()
 
     line = file.readline()
     aux = line.split()
@@ -186,10 +219,13 @@ def main():
     readFile("entrada1.txt")
     print("partindo da origem temos a seguinte sequencia \n")
     robot = Robot.Robot(points["Start"], points)
+    robot.printUnvisitedPoints()
     visiblePoints = []
-    for point in list(robot.unvisitedPoints.values()):
+    for point in robot.unvisitedPoints:
+        #print(point.name, end=": ")
         if point != points["Start"]:
-            visible = intersectPoligon(robot.currentPoint.coord, point.coord)
+            visible = isVisible(robot.currentPoint.coord, point.coord)
+            # print(visible)
             if(visible):
                 print(point.name)
                 visiblePoints.append(point)

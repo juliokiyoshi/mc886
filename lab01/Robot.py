@@ -6,7 +6,8 @@ class Robot:
     def __init__(self, initialPosition, points):
         self.initialPosition = initialPosition
         self.visitedPoints = []
-        self.unvisitedPoints = points
+        self.unvisitedPoints = points.values()
+        # self.unvisitedPoints.remove(initialPosition)
         self.visiblePoints = []
         self.currentPoint: Point = initialPosition
         self.distanceTraveled = 0
@@ -27,7 +28,13 @@ class Robot:
     def printVisiblePoints(self):
         print("PONTOS VISIVEIS: ")
         for point in self.visiblePoints:
-            print(point.name + "->", end="")
+            print(f"{point.name}{point.coord}", end="  ")
+        print()
+
+    def printUnvisitedPoints(self):
+        print("PONTOS NAO VISITADOS: ")
+        for point in self.unvisitedPoints:
+            print(point.name + ", ", end="")
         print()
 
     def addVisiblePoint(self, newPoint):

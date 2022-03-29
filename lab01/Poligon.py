@@ -24,3 +24,8 @@ class Poligon:
         for edge in self.edges:
             edge.PrintLine()
         print()
+
+    def printEdges(self):
+        print("Poligono: ", self.id)
+        for edge in self.edges:
+            print(f"{edge.point1.name} {edge.point2.name}")
