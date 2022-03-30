@@ -13,12 +13,14 @@ points = {}
 poligons = {}
 init = Point
 
+# a partir do caminho dado le um arquivo
+# constroi os pontos, os poligonos e as arestas
+
 
 def readFile(path):
     file = open(path, "r")
     for line in file:
         if(line[0] == "\n"):
-            print("---------------")
             break
         aux = line.split()
         if(line[0].isalpha()):
@@ -28,7 +30,6 @@ def readFile(path):
 
     for line in file:
         if(line[0] == "\n"):
-            print("---------------")
             break
         aux = line.split()
         if(len(line) > 2):
@@ -38,7 +39,6 @@ def readFile(path):
             for i in range(1, len(aux) - 1):
                 poligon.CreateEdge(points[aux[i]], points[aux[i+1]])
             poligons[poligon.id] = poligon
-            poligons[poligon.id].printEdges()
 
     line = file.readline()
     aux = line.split()
@@ -50,9 +50,6 @@ def readFile(path):
     points["Finish"] = finish
 
     init.Point = start
-    start.printPoint()
-    finish.printPoint()
-    print("---------------")
 
 
 def perp(a):
@@ -63,6 +60,7 @@ def perp(a):
 
 # line segment a given by endpoints a1, a2
 # line segment b given by endpoints b1, b2
+# retorna True se ha interseccao e False caso contrario
 
 
 def seg_intersect(p1, p2, q1, q2):
@@ -78,22 +76,19 @@ def seg_intersect(p1, p2, q1, q2):
     num = dot(dap, dp)
     if denom != 0:
         intersect = (num/denom)*db + b1
-        # print ("\n points are {} ={} e {} ={}".format(p1.name,a1,p2.name,a2))
-        # print (" the intesercpt poits is = {} \n".format(intersect))
-        if intersect[0] == a2[0] and  intersect[1]== a2[1]:
+        if intersect[0] == a2[0] and intersect[1] == a2[1]:
             return False
-        if intersect[0] == a1[0] and  intersect[1]== a1[1]:
+        if intersect[0] == a1[0] and intersect[1] == a1[1]:
             return False
-        
-        #print(f"{p1.name}-{p2.name}   {q1.name}-{q2.name}")
+
         if (intersect[0] >= a1[0] and intersect[0] <= a2[0]) or (intersect[0] <= a1[0] and intersect[0] >= a2[0]):
             if (intersect[1] >= a1[1] and intersect[1] <= a2[1]) or (intersect[1] <= a1[1] and intersect[1] >= a2[1]):
                 if (intersect[0] >= b1[0] and intersect[0] <= b2[0]) or (intersect[0] <= b1[0] and intersect[0] >= b2[0]):
                     if (intersect[1] >= b1[1] and intersect[1] <= b2[1]) or (intersect[1] <= b1[1] and intersect[1] >= b2[1]):
-                        # print(intersect)
                         return True
-        #print("Nao interceptam")
         return False
+
+# diz se o ponto destiny é visivel a partir de origin
 
 
 def isVisible(origin: Point, destiny: Point):
@@ -106,52 +101,69 @@ def isVisible(origin: Point, destiny: Point):
                     return False
     return True
 
-def verifyIfTwoVerticesAreAdjacent(origin:Point, destiny:Point):
+# Verifica se dois pontos sao adjacentes
+# retorna True se forem e False caso contrário
+
+
+def verifyIfTwoVerticesAreAdjacent(origin: Point, destiny: Point):
     for edge in poligons[findPoligon(origin)].edges:
         if (origin.name == edge.p1.name and destiny.name == edge.p2.name) or (origin.name == edge.p2.name and destiny.name == edge.p1.name):
             return True
     return False
 
-def findNodes(origin:Point, destiny:Point):
+# recebe um ponto de origem rotorna se o destiny é visivel
+
+
+def findNodes(origin: Point, destiny: Point):
     if destiny.name == "Start":
         return False
     if origin.name == "Start":
         return isVisible(origin, destiny)
     else:
-        if itsInTheSamePoligon(origin,destiny):
-            return verifyIfTwoVerticesAreAdjacent(origin,destiny)
+        if itsInTheSamePoligon(origin, destiny):
+            return verifyIfTwoVerticesAreAdjacent(origin, destiny)
         else:
-            return isVisible(origin,destiny)
-    
-def findPoligon(p1:Point):
+            return isVisible(origin, destiny)
+
+# retorna o polígono do ponto
+
+
+def findPoligon(p1: Point):
     for poligon in poligons.values():
         for point in poligon.points:
             if p1.name == point.name:
-                return poligon.id        
+                return poligon.id
+
+# verifica se o ponto de destino esta no mesmo póligono que o de destino
+
 
 def itsInTheSamePoligon(origin: Point, destiny: Point):
-    originId=findPoligon(origin)
-    destinyId=findPoligon(destiny)
+    originId = findPoligon(origin)
+    destinyId = findPoligon(destiny)
     if originId == destinyId:
         return True
     else:
         return False
 
+# retorna os pontos visiveis de um ponto raiz
+
+
 def findChildren(vertice: str):
     visiblePoints = []
-    oringin = points[vertice]    
+    oringin = points[vertice]
     for point in points.values():
         if point != oringin and findNodes(oringin, point):
             visiblePoints.append(point)
             print(f"{oringin.name} ve {point.name}")
     return visiblePoints
 
+
 def main():
     readFile("entrada1.txt")
-    lista=findChildren("Start")
+    lista = findChildren("Start")
     for lst in lista:
         print(lst.name)
 
-    
+
 if __name__ == "__main__":
     main()
