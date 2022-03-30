@@ -78,6 +78,13 @@ def seg_intersect(p1, p2, q1, q2):
     num = dot(dap, dp)
     if denom != 0:
         intersect = (num/denom)*db + b1
+        # print ("\n points are {} ={} e {} ={}".format(p1.name,a1,p2.name,a2))
+        # print (" the intesercpt poits is = {} \n".format(intersect))
+        if intersect[0] == a2[0] and  intersect[1]== a2[1]:
+            return False
+        if intersect[0] == a1[0] and  intersect[1]== a1[1]:
+            return False
+        
         #print(f"{p1.name}-{p2.name}   {q1.name}-{q2.name}")
         if (intersect[0] >= a1[0] and intersect[0] <= a2[0]) or (intersect[0] <= a1[0] and intersect[0] >= a2[0]):
             if (intersect[1] >= a1[1] and intersect[1] <= a2[1]) or (intersect[1] <= a1[1] and intersect[1] >= a2[1]):
@@ -99,13 +106,52 @@ def isVisible(origin: Point, destiny: Point):
                     return False
     return True
 
+def verifyIfTwoVerticesAreAdjacent(origin:Point, destiny:Point):
+    for edge in poligons[findPoligon(origin)].edges:
+        if (origin.name == edge.p1.name and destiny.name == edge.p2.name) or (origin.name == edge.p2.name and destiny.name == edge.p1.name):
+            return True
+    return False
+
+
+
+def findNodes(origin:Point, destiny:Point):
+    if destiny.name == "Start":
+        return False
+    if origin.name == "Start":
+        return isVisible(origin, destiny)
+    else:
+        if itsInTheSamePoligon(origin,destiny):
+            return verifyIfTwoVerticesAreAdjacent(origin,destiny)
+        else:
+            return isVisible(origin,destiny)
+
+
+    
+def findPoligon(p1:Point):
+    for poligon in poligons.values():
+        for point in poligon.points:
+            if p1.name == point.name:
+                return poligon.id        
+                
+
+
+def itsInTheSamePoligon(origin: Point, destiny: Point):
+    originId=findPoligon(origin)
+    destinyId=findPoligon(destiny)
+    if originId == destinyId:
+        return True
+    else:
+        return False
+
+    
+
 
 def main():
     readFile("entrada1.txt")
     visiblePoints = []
-    oringin = points["c"]
+    oringin = points["a"]    
     for point in points.values():
-        if point != oringin and isVisible(oringin, point):
+        if point != oringin and findNodes(oringin, point):
             visiblePoints.append(point)
             print(f"{oringin.name} ve {point.name}")
 
