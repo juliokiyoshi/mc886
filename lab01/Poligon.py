@@ -13,7 +13,7 @@ class Poligon:
         self.points.append(newPoint)
         self.numberOfVertices += 1
 
-    def CreateEdge(self, point1, point2):
+    def CreateEdge(self, point1: Point, point2: Point):
         edge = Line.Line(point1, point2)
         self.edges.append(edge)
 
@@ -28,4 +28,5 @@ class Poligon:
     def printEdges(self):
         print("Poligono: ", self.id)
         for edge in self.edges:
-            print(f"{edge.point1.name} {edge.point2.name}")
+            print(
+                f"{edge.p1.name}{edge.p1.coord} {edge.p2.name}{edge.p2.coord}")

@@ -1,14 +1,12 @@
 import math
+import numpy as np
 
 
 class Point:
-    name = ""
-    coord = ()
-
-    def __init__(self, name, x, y):
+    def __init__(self, name, x: float, y: float):
         self.name = name
-        self.coord = (x, y)
-        self.visit= False
+        self.coord = np.array([x, y])
+        self.visit = False
 
     def printPoint(self):
         print(self.name + ":", self.coord)
