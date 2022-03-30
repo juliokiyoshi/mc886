@@ -112,8 +112,6 @@ def verifyIfTwoVerticesAreAdjacent(origin:Point, destiny:Point):
             return True
     return False
 
-
-
 def findNodes(origin:Point, destiny:Point):
     if destiny.name == "Start":
         return False
@@ -124,16 +122,12 @@ def findNodes(origin:Point, destiny:Point):
             return verifyIfTwoVerticesAreAdjacent(origin,destiny)
         else:
             return isVisible(origin,destiny)
-
-
     
 def findPoligon(p1:Point):
     for poligon in poligons.values():
         for point in poligon.points:
             if p1.name == point.name:
                 return poligon.id        
-                
-
 
 def itsInTheSamePoligon(origin: Point, destiny: Point):
     originId=findPoligon(origin)
@@ -143,18 +137,21 @@ def itsInTheSamePoligon(origin: Point, destiny: Point):
     else:
         return False
 
-    
-
-
-def main():
-    readFile("entrada1.txt")
+def findChildren(vertice: str):
     visiblePoints = []
-    oringin = points["a"]    
+    oringin = points[vertice]    
     for point in points.values():
         if point != oringin and findNodes(oringin, point):
             visiblePoints.append(point)
             print(f"{oringin.name} ve {point.name}")
+    return visiblePoints
 
+def main():
+    readFile("entrada1.txt")
+    lista=findChildren("Start")
+    for lst in lista:
+        print(lst.name)
 
+    
 if __name__ == "__main__":
     main()
