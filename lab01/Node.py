@@ -4,9 +4,7 @@ class Node:
         self.name = state.name
         self.parent = parent
         self.cost = cost
-        self.depth = 0
-        if parent:
-            self.depth = parent.depth+1
+        self.score = 0
 
     def printPath(self):
         node = self
@@ -25,8 +23,15 @@ class Node:
         node = self
         pathCost = 0
         while node:
+            print(f"node {self.name} = {self.cost}, parent {self.parent}")
             pathCost += self.cost
             node = node.parent
         print("CUSTO DO CAMINHO: " + str(pathCost))
+
+    def setScore(self, score):
+        self.score = score
+
+    def setCost(self, cost):
+        self.cost = cost
 
 

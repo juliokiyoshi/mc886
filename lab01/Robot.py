@@ -19,7 +19,8 @@ class Robot:
         self.currentPoint = newPoint
         self.visiblePoints.clear()
         self.visitedPoints.append(newPoint)
-        self.unvisitedPoints.remove(newPoint)
+        if newPoint in self.unvisitedPoints:
+            self.unvisitedPoints.remove(newPoint)
         return cost
 
     def printVisitedPoints(self):
