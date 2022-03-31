@@ -171,9 +171,9 @@ def recursiveDLS(node, robot: Robot, limit: int):
         for child in findChildren(robot.currentPoint):
             if robot.isVisited(child) or robot.isCurrentPoint(child):
                 continue
-            print(f"de {node.name} vai mover para {child.name}")
-            robot.moveToPoint(child)
-            result = recursiveDLS(Node(child, node), robot, limit-1)
+            # print(f"de {node.name} vai mover para {child.name}")
+            cost = robot.moveToPoint(child)
+            result = recursiveDLS(Node(child, node, cost), robot, limit-1)
             if result == 'cutoff':
                 cutoffOcurred = True
             elif result is not None:
@@ -187,7 +187,7 @@ def depthLimitedSearch(robot, limit):
 
 def iterativeDeepeningSearch(robot):
     for depth in range(sys.maxsize):
-        print(f"DEPTH: {depth}")
+        # print(f"DEPTH: {depth}")
         robot.restart()
         result = depthLimitedSearch(robot, depth)
         if result != 'cutoff':
@@ -201,7 +201,9 @@ def main():
     #     # for lst in lista:
     #     #     print(lst.name)
     robot = Robot.Robot(points["Start"], points)
-    iterativeDeepeningSearch(robot)
+    node = iterativeDeepeningSearch(robot)
+    node.printPath()
+    robot.printVisitedPoints()
 
 
 if __name__ == "__main__":

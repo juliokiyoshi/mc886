@@ -14,11 +14,13 @@ class Robot:
         self.distanceTraveled = 0
 
     def moveToPoint(self, newPoint: Point):
-        self.distanceTraveled += newPoint.DistanceToPoint(self.currentPoint)
+        cost = newPoint.DistanceToPoint(self.currentPoint)
+        self.distanceTraveled += cost
         self.currentPoint = newPoint
         self.visiblePoints.clear()
         self.visitedPoints.append(newPoint)
         self.unvisitedPoints.remove(newPoint)
+        return cost
 
     def printVisitedPoints(self):
         print("PONTOS VISITADOS: ")
