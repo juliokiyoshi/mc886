@@ -1,11 +1,12 @@
 from __future__ import division
 from numpy import *
-
+import sys
 
 from ast import Break
 import Point
 import Poligon
 import Robot
+from Node import Node
 import numpy as np
 
 # global variables
@@ -148,21 +149,59 @@ def itsInTheSamePoligon(origin: Point, destiny: Point):
 # retorna os pontos visiveis de um ponto raiz
 
 
-def findChildren(vertice: str):
+def findChildren(vertice: Point):
     visiblePoints = []
-    oringin = points[vertice]
     for point in points.values():
-        if point != oringin and findNodes(oringin, point):
+        if point != vertice and findNodes(vertice, point):
             visiblePoints.append(point)
-            print(f"{oringin.name} ve {point.name}")
+            # print(f"{vertice.name} ve {point.name}")
     return visiblePoints
+
+
+# ITERATIVE DEEPENING SEARCH FUNCTIONS #
+def recursiveDLS(node, robot: Robot, limit: int):
+    # robot.printVisitedPoints()
+    # robot.printUnvisitedPoints()
+    if robot.currentPoint == points["Finish"]:
+        return node
+    elif limit == 0:
+        return 'cutoff'
+    else:
+        cutoffOcurred = False
+        for child in findChildren(robot.currentPoint):
+            if robot.isVisited(child) or robot.isCurrentPoint(child):
+                continue
+            print(f"de {node.name} vai mover para {child.name}")
+            robot.moveToPoint(child)
+            result = recursiveDLS(Node(child, node), robot, limit-1)
+            if result == 'cutoff':
+                cutoffOcurred = True
+            elif result is not None:
+                return result
+        return 'cutoff' if cutoffOcurred else None
+
+
+def depthLimitedSearch(robot, limit):
+    return recursiveDLS(Node(points["Start"]), robot, limit)
+
+
+def iterativeDeepeningSearch(robot):
+    for depth in range(sys.maxsize):
+        print(f"DEPTH: {depth}")
+        robot.restart()
+        result = depthLimitedSearch(robot, depth)
+        if result != 'cutoff':
+            return result
 
 
 def main():
     readFile("entrada1.txt")
-    lista = findChildren("Start")
-    for lst in lista:
-        print(lst.name)
+    # for point in points.values():
+    #     lista = findChildren(point)
+    #     # for lst in lista:
+    #     #     print(lst.name)
+    robot = Robot.Robot(points["Start"], points)
+    iterativeDeepeningSearch(robot)
 
 
 if __name__ == "__main__":
