@@ -207,7 +207,6 @@ def iterativeDeepeningSearch(robot):
 # END OF ITERATIVE DEEPENING FUNCTIONS #
 
 # BFS A* FUNCTIONS #
-
 def bestFirstSearch(robot, f):
     node = Node(points["Start"])
     node.setScore(f(node))

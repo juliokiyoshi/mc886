@@ -18,7 +18,8 @@ class Robot:
         self.distanceTraveled += cost
         self.currentPoint = newPoint
         self.visiblePoints.clear()
-        self.visitedPoints.append(newPoint)
+        if newPoint != self.initialPosition:
+            self.visitedPoints.append(newPoint)
         if newPoint in self.unvisitedPoints:
             self.unvisitedPoints.remove(newPoint)
         return cost
@@ -26,8 +27,11 @@ class Robot:
     def printVisitedPoints(self):
         print("PONTOS VISITADOS: ")
         for point in self.visitedPoints:
-            print(point.name + "->", end="")
-        print()
+            if point.name == 'Finish':
+                print(point.name)
+            else:
+                print(point.name + "->", end="")
+        print(str(len(self.visitedPoints)) + " pontos visitados")
 
     def printVisiblePoints(self):
         print("PONTOS VISIVEIS: ")

@@ -23,8 +23,8 @@ class Node:
         node = self
         pathCost = 0
         while node:
-            print(f"node {self.name} = {self.cost}, parent {self.parent}")
-            pathCost += self.cost
+            node.cost = node.state.DistanceToPoint(node.parent.state) if node.parent else 0
+            pathCost += node.cost
             node = node.parent
         print("CUSTO DO CAMINHO: " + str(pathCost))
 
