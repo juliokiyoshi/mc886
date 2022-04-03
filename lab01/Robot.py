@@ -5,25 +5,33 @@ class Robot:
 
     def __init__(self, initialPosition, points):
         self.initialPosition = initialPosition
-        self.visitedPoints = []
-        self.unvisitedPoints = points.values()
-        # self.unvisitedPoints.remove(initialPosition)
+        self.visitedPoints = [initialPosition]
+        self.points = points
+        self.unvisitedPoints = list(points.values())
+        self.unvisitedPoints.remove(initialPosition)
         self.visiblePoints = []
         self.currentPoint: Point = initialPosition
         self.distanceTraveled = 0
 
     def moveToPoint(self, newPoint: Point):
-        self.visitedPoints.append(self.currentPoint)
-        self.distanceTraveled += newPoint.DistanceToPoint(self.currentPoint)
+        cost = newPoint.DistanceToPoint(self.currentPoint)
+        self.distanceTraveled += cost
         self.currentPoint = newPoint
         self.visiblePoints.clear()
-        self.unvisitedPoints.remove(newPoint)
+        if newPoint != self.initialPosition:
+            self.visitedPoints.append(newPoint)
+        if newPoint in self.unvisitedPoints:
+            self.unvisitedPoints.remove(newPoint)
+        return cost
 
     def printVisitedPoints(self):
         print("PONTOS VISITADOS: ")
         for point in self.visitedPoints:
-            print(point.name + "->", end="")
-        print()
+            if point.name == 'Finish':
+                print(point.name)
+            else:
+                print(point.name + "->", end="")
+        print(str(len(self.visitedPoints)) + " pontos visitados")
 
     def printVisiblePoints(self):
         print("PONTOS VISIVEIS: ")
@@ -39,3 +47,17 @@ class Robot:
 
     def addVisiblePoint(self, newPoint):
         self.visiblePoints.append(newPoint)
+
+    def isVisited(self, point):
+        return True if point in self.visitedPoints else False
+
+    def isCurrentPoint(self, point):
+        return self.currentPoint == point
+
+    def restart(self):
+        self.visitedPoints = [self.initialPosition]
+        self.unvisitedPoints = list(self.points.values())
+        self.unvisitedPoints.remove(self.initialPosition)
+        self.visiblePoints = []
+        self.currentPoint: Point = self.initialPosition
+        self.distanceTraveled = 0
